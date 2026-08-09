@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://ln6ykvmp55h1"]
+
+[ext_resource type="PackedScene" uid="uid://c0p5nkbxve87l" path="res://assets/Roof Flat Center/roof-flat-center.fbx" id="1_gleiq"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_gleiq"]
+points = PackedVector3Array(-1, 0, -1, -1, 0.1, -1, 1, 0, -1, -1, 0, 1, -1, 0.1, 1, 1, 0.1, -1, 1, 0, 1, 1, 0.1, 1)
+
+[node name="Roof" instance=ExtResource("1_gleiq")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="roof-flat-center" index="0"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="roof-flat-center/StaticBody3D" index="0"]
+shape = SubResource("ConvexPolygonShape3D_gleiq")

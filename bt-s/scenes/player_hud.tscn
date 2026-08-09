@@ -1,0 +1,541 @@
+[gd_scene load_steps=47 format=3 uid="uid://mg80qmm4rphw"]
+
+[ext_resource type="Script" uid="uid://dfwxe265ikhs2" path="res://scripts/PlayerHUD.gd" id="1_mlvnn"]
+[ext_resource type="Texture2D" uid="uid://hskrl0p3e3hl" path="res://assets/ui/90sec c/TImer frame with increasing time eff1.png" id="2_qcjqi"]
+[ext_resource type="Texture2D" uid="uid://d1wkb07u6o30w" path="res://assets/ui/90sec c/TImer frame with increasing time eff2.png" id="3_s25gh"]
+[ext_resource type="Texture2D" uid="uid://dalkykhewcv4e" path="res://assets/ui/90sec c/TImer frame with increasing time eff3.png" id="4_ujnyd"]
+[ext_resource type="Texture2D" uid="uid://cvj0ha6cwehfj" path="res://assets/ui/90sec c/TImer frame with increasing time eff4.png" id="5_lqhkl"]
+[ext_resource type="Shader" uid="uid://b2jg6gj1f06er" path="res://shaders/Timer.gdshader" id="7_lqhkl"]
+[ext_resource type="FontFile" uid="uid://dltlecj6wu4nu" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="7_ujnyd"]
+[ext_resource type="Texture2D" uid="uid://bkc7ct05oj2nq" path="res://assets/ui/Ability Reset.png" id="9_50hf8"]
+[ext_resource type="Script" uid="uid://2j4nm3aejqs1" path="res://scripts/AbilityCooldownBar.gd" id="10_mta0a"]
+
+[sub_resource type="Shader" id="Shader_ocgqw"]
+code = "shader_type canvas_item;
+render_mode unshaded;
+
+uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_linear;
+
+// =====================================================
+// CORE STATE
+// =====================================================
+uniform float global_strength = 1.0;
+uniform float sanity = 1.0;          // 1 = calm, 0 = broken
+uniform float ghost_proximity = 0.0; // 0 = far, 1 = inside you
+uniform float flash = 0.0;
+uniform float time_scale = 1.0;
+
+// =====================================================
+// VISUAL IDENTITY
+// =====================================================
+uniform float pixel_size = 260.0;
+uniform float color_steps = 56.0;
+uniform float chroma = 0.8;
+
+// =====================================================
+// HORROR SIGNALS
+// =====================================================
+uniform float grain = 0.22;
+uniform float vignette = 1.8;
+uniform float flicker = 0.08;
+uniform float scanlines = 0.15;
+uniform float static_noise = 0.35;
+uniform float decay = 0.45;
+
+// =====================================================
+// PSYCHO / BODY REACTION
+// =====================================================
+uniform float nausea = 0.35;
+uniform float ghost_trail = 0.35;
+uniform float memory_drag = 0.35; // time distortion
+uniform float perception_warp = 0.4;
+
+// =====================================================
+// HELPERS
+// =====================================================
+float rand(vec2 p){
+	return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453);
+}
+
+vec2 pixelate(vec2 uv){
+	vec2 res = vec2(textureSize(SCREEN_TEXTURE, 0));
+	vec2 count = res / pixel_size;
+	return floor(uv * count) / count;
+}
+
+vec3 quantize(vec3 c){
+	return floor(c * color_steps) / color_steps;
+}
+
+vec3 chroma_sample(vec2 uv){
+	float off = chroma * 0.002;
+	return vec3(
+		texture(SCREEN_TEXTURE, uv + vec2(off,0)).r,
+		texture(SCREEN_TEXTURE, uv).g,
+		texture(SCREEN_TEXTURE, uv - vec2(off,0)).b
+	);
+}
+
+// =====================================================
+// MAIN
+// =====================================================
+void fragment(){
+	float t = TIME * time_scale;
+	vec2 uv = SCREEN_UV;
+
+	// =====================================================
+	// PERCEPTION WARP (SUBTLE BUT EVIL)
+	// =====================================================
+	float mind = (1.0 - sanity);
+	uv += vec2(
+		sin(uv.y * 12.0 + t * 1.3),
+		cos(uv.x * 9.0 + t * 1.1)
+	) * perception_warp * mind * 0.004;
+
+	// =====================================================
+	// NAUSEA / INNER EAR FAILURE
+	// =====================================================
+	uv.x += sin(t * 1.7) * nausea * ghost_proximity * 0.01;
+	uv.y += cos(t * 1.2) * nausea * ghost_proximity * 0.008;
+
+	// =====================================================
+	// PIXEL MEMORY SNAP
+	// =====================================================
+	vec2 puv = pixelate(uv);
+	vec3 col = chroma_sample(puv);
+
+	// =====================================================
+	// MEMORY GHOSTS (AFTERIMAGE FROM WRONG TIME)
+	// =====================================================
+	vec2 memory_uv = puv + vec2(
+		sin(t * 0.7) * memory_drag * 0.004,
+		cos(t * 0.6) * memory_drag * 0.003
+	);
+	vec3 memory = texture(SCREEN_TEXTURE, memory_uv).rgb;
+	col = mix(col, memory, ghost_trail * (1.0 - sanity));
+
+	// =====================================================
+	// FILM GRAIN (ALIVE)
+	// =====================================================
+	col += (rand(uv * t * 1200.0) - 0.5) * grain;
+
+	// =====================================================
+	// SCANLINES (BREATHING)
+	// =====================================================
+	col -= sin(uv.y * 900.0 + t * 6.0) * scanlines * 0.05;
+
+	// =====================================================
+	// FLICKER (HEARTBEAT-LIKE)
+	// =====================================================
+	col *= 1.0 + sin(t * 50.0 + ghost_proximity * 6.0) * flicker;
+
+	// =====================================================
+	// COLOR DECAY (SANITY KILLER)
+	// =====================================================
+	col *= vec3(
+		1.0 - decay * 0.25 * mind,
+		1.0 - decay * 0.12 * mind,
+		1.0 - decay * 0.35 * mind
+	);
+
+	// =====================================================
+	// STATIC NOISE (WHEN IT WANTS YOU GONE)
+	// =====================================================
+	col += (rand(vec2(uv.y * 800.0, t)) - 0.5)
+		* static_noise * ghost_proximity * 0.08;
+
+	// =====================================================
+	// VIGNETTE (TUNNEL VISION)
+	// =====================================================
+	float d = distance(uv, vec2(0.5));
+	col *= 1.0 - smoothstep(0.25, 0.9, d) * vignette;
+
+	// =====================================================
+	// COLOR QUANTIZATION (PSX DEATH)
+	// =====================================================
+	col = quantize(col);
+
+	// =====================================================
+	// FLASH / GHOST PRESSURE
+	// =====================================================
+	col += flash * vec3(1.0, 0.85, 0.7);
+	col += vec3(
+		ghost_proximity * 0.15,
+		0.0,
+		ghost_proximity * 0.25
+	);
+
+	// =====================================================
+	// FINAL MIX
+	// =====================================================
+	vec3 base = texture(SCREEN_TEXTURE, SCREEN_UV).rgb;
+	col = mix(base, col, global_strength);
+
+	COLOR = vec4(clamp(col, 0.0, 1.0), 1.0);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jbgew"]
+shader = SubResource("Shader_ocgqw")
+shader_parameter/global_strength = 1.0
+shader_parameter/sanity = 1.0
+shader_parameter/ghost_proximity = 0.0
+shader_parameter/flash = 0.0
+shader_parameter/time_scale = 1.0
+shader_parameter/pixel_size = 240.0
+shader_parameter/color_steps = 56.0
+shader_parameter/chroma = 0.8
+shader_parameter/grain = 0.15
+shader_parameter/vignette = 1.6
+shader_parameter/flicker = 0.08
+shader_parameter/scanlines = 0.12
+shader_parameter/static_noise = 0.25
+shader_parameter/decay = 0.35
+shader_parameter/nausea = 0.35
+shader_parameter/ghost_trail = 0.18
+shader_parameter/memory_drag = 0.35
+shader_parameter/perception_warp = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8y7rk"]
+shader = ExtResource("7_lqhkl")
+shader_parameter/distress = 0.0
+shader_parameter/pulse_speed = 6.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_lqhkl"]
+font_size = 45
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_50hf8"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(0, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mta0a"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(256, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7yc75"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(512, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_aiaqn"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(768, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hpbnu"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(1024, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hdl38"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(1280, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3pvjt"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(1536, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ke71k"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(1792, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_43ll4"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(2048, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iakl3"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(2304, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0gtav"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(2560, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2c2e2"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(2816, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e3h3h"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(3072, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a4ece"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(3328, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g1k2i"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(3584, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ej7kq"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(3840, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rhti3"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(4096, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ayrit"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(4352, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rlnkx"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(4608, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7vjrf"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(4864, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_726qe"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(5120, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5yk0q"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(5376, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5objs"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(5632, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vpp3t"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(5888, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_188yi"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(6144, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fecn2"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(6400, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cfs2w"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(6656, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fmgem"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(6912, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ei72"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(7168, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2j75a"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(7424, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4au33"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(7680, 0, 256, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8kotc"]
+atlas = ExtResource("9_50hf8")
+region = Rect2(7936, 0, 256, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pe3xa"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_50hf8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mta0a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7yc75")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_aiaqn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hpbnu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hdl38")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3pvjt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ke71k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_43ll4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iakl3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0gtav")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2c2e2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e3h3h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a4ece")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g1k2i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ej7kq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rhti3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ayrit")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rlnkx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7vjrf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_726qe")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5yk0q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5objs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vpp3t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_188yi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fecn2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cfs2w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fmgem")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ei72")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2j75a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4au33")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8kotc")
+}],
+"loop": false,
+"name": &"cooldown",
+"speed": 1.0
+}]
+
+[node name="Control" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_mlvnn")
+show_minutes = false
+frame_state_1 = ExtResource("2_qcjqi")
+frame_state_2 = ExtResource("3_s25gh")
+frame_state_3 = ExtResource("4_ujnyd")
+frame_state_4 = ExtResource("5_lqhkl")
+post_process_material = SubResource("ShaderMaterial_jbgew")
+shader_intensity_state_1 = 0.3
+shader_intensity_state_2 = 0.6
+shader_intensity_state_3 = 1.0
+shader_intensity_state_4 = 1.3
+
+[node name="SafeArea" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopCenter" type="Control" parent="SafeArea"]
+layout_mode = 1
+anchor_left = 0.92800003
+anchor_top = 0.006
+anchor_right = 0.9850001
+anchor_bottom = 0.11000001
+offset_left = -0.35998535
+offset_top = 0.3039999
+offset_right = -0.20007324
+offset_bottom = 0.23999786
+grow_horizontal = 0
+
+[node name="TimerFrame" type="TextureRect" parent="SafeArea/TopCenter"]
+visible = false
+material = SubResource("ShaderMaterial_8y7rk")
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -1.516
+anchor_top = 0.35900003
+anchor_right = 0.437
+anchor_bottom = 2.312
+offset_left = 0.024002075
+offset_top = -2.9760017
+offset_right = 3.0319996
+offset_bottom = 0.03199768
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 4
+
+[node name="TimerLabel" type="Label" parent="SafeArea/TopCenter"]
+z_index = 1
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -1.2590001
+anchor_right = 1.0
+anchor_bottom = 2.125
+offset_left = -0.022399902
+offset_top = -3.4319992
+offset_right = 1.9198837
+offset_bottom = 0.03225708
+theme_override_fonts/font = ExtResource("7_ujnyd")
+theme_override_font_sizes/font_size = 18
+text = "90"
+label_settings = SubResource("LabelSettings_lqhkl")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="SafeArea/TopCenter"]
+z_index = 1
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -4.696
+anchor_top = 1.197
+anchor_right = -0.109000005
+anchor_bottom = 2.9870002
+offset_left = 0.022064209
+offset_top = -0.0031433105
+offset_right = -0.012760639
+offset_bottom = 0.033294678
+theme_override_fonts/font = ExtResource("7_ujnyd")
+theme_override_font_sizes/font_size = 18
+text = "SCORE: 0"
+label_settings = SubResource("LabelSettings_lqhkl")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CooldownSprite" type="AnimatedSprite2D" parent="SafeArea"]
+position = Vector2(169, 76)
+sprite_frames = SubResource("SpriteFrames_pe3xa")
+animation = &"cooldown"
+script = ExtResource("10_mta0a")
+reset_hold_time = 1.0

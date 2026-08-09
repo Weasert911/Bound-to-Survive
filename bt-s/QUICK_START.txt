@@ -1,0 +1,21 @@
+BOUND TO SURVIVE
+
+BASIC CONTROLS
+
+ MOUSE - Look Around & Aim Flashlight
+ F key - Use Flashlight
+ ESC - Pause Menu
+
+
+HOW TO PLAY
+ Survive for 90 seconds
+ Use flashlight to stun the ghost and score points
+ Avoid ghost attacks
+ Score high
+
+GHOST BEHAVIOR
+ Teleports around the room
+ Gets faster after each flashlight hit
+ Attacks when close to you
+ Makes sounds when nearby
+

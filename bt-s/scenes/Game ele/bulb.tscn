@@ -1,0 +1,32 @@
+[gd_scene load_steps=4 format=3 uid="uid://dhyhmemho3fel"]
+
+[ext_resource type="PackedScene" uid="uid://cmyftb7b70sr1" path="res://assets/Light bulb/lightbulb.fbx" id="1_7rbym"]
+
+[sub_resource type="Shader" id="Shader_7rbym"]
+code = "shader_type spatial;
+render_mode cull_front, unshaded;
+
+uniform float outline_width : hint_range(0.0, 0.1) = 0.03;
+uniform vec4 outline_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);
+
+void vertex() {
+    NORMAL = normalize(NORMAL);
+    VERTEX += NORMAL * outline_width;
+}
+
+void fragment() {
+    ALBEDO = outline_color.rgb;
+    ALPHA = outline_color.a;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_t4ovs"]
+render_priority = 0
+shader = SubResource("Shader_7rbym")
+shader_parameter/outline_width = 0.10000000149012
+shader_parameter/outline_color = Color(1, 1, 1, 1)
+
+[node name="Bulb" instance=ExtResource("1_7rbym")]
+
+[node name="cable" parent="." index="1"]
+surface_material_override/0 = SubResource("ShaderMaterial_t4ovs")

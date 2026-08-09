@@ -1,0 +1,112 @@
+[gd_scene load_steps=12 format=3 uid="uid://bckl23ppnvwqq"]
+
+[ext_resource type="FontFile" uid="uid://dltlecj6wu4nu" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="1_grxa8"]
+[ext_resource type="Script" uid="uid://c5s34mqvpaea2" path="res://scripts/it.gd" id="1_wcsmb"]
+[ext_resource type="Shader" uid="uid://vw80tty2oaxd" path="res://shaders/px1.gdshader" id="2_wcsmb"]
+[ext_resource type="Shader" uid="uid://dcdf23ueqwwmp" path="res://shaders/Painterly.gdshader" id="3_x7l5g"]
+[ext_resource type="Shader" uid="uid://blhe6ciappw3f" path="res://shaders/pixellated.gdshader" id="4_wg483"]
+[ext_resource type="Shader" uid="uid://bu6wv43muk6bb" path="res://shaders/PalleteL.gdshader" id="5_qer6h"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_ulots"]
+font = ExtResource("1_grxa8")
+font_size = 72
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1r14w"]
+shader = ExtResource("2_wcsmb")
+shader_parameter/distortion_power = 0.0
+shader_parameter/chromatic_aberration = 0.0
+shader_parameter/shake_speed = 1.5000000712500001
+shader_parameter/hell_tint = Color(0.3, 0.05, 0, 1)
+shader_parameter/vignette_size = 0.250000011875
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rr2k2"]
+shader = ExtResource("3_x7l5g")
+shader_parameter/color_levels = 12.000000475
+shader_parameter/edge_strength = 0.5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dko3a"]
+shader = ExtResource("4_wg483")
+shader_parameter/pixel_size = 512.0000242725
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_oahpn"]
+shader = ExtResource("5_qer6h")
+shader_parameter/vein_intensity = 0.250000011875
+shader_parameter/time = 0.0
+
+[node name="IntroTextLayer" type="CanvasLayer"]
+layer = 4
+script = ExtResource("1_wcsmb")
+
+[node name="Blackbg" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="Blackbg"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.48400003
+anchor_top = 0.48400003
+anchor_right = 0.51600003
+anchor_bottom = 0.51600003
+offset_left = 0.47998047
+offset_top = 0.019989014
+offset_right = -0.4800415
+offset_bottom = -0.020019531
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 72
+label_settings = SubResource("LabelSettings_ulots")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Postproccess" type="Node" parent="."]
+
+[node name="PostproccessShader" type="CanvasLayer" parent="Postproccess"]
+layer = 7
+visible = false
+
+[node name="ColorRect2" type="ColorRect" parent="Postproccess/PostproccessShader"]
+material = SubResource("ShaderMaterial_1r14w")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="PostproccessShader2" type="CanvasLayer" parent="Postproccess"]
+layer = 8
+
+[node name="ColorRect3" type="ColorRect" parent="Postproccess/PostproccessShader2"]
+material = SubResource("ShaderMaterial_rr2k2")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PostproccessShader3" type="CanvasLayer" parent="Postproccess"]
+layer = 9
+
+[node name="ColorRect" type="ColorRect" parent="Postproccess/PostproccessShader3"]
+material = SubResource("ShaderMaterial_dko3a")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PostproccessShader5" type="CanvasLayer" parent="Postproccess"]
+layer = 10
+
+[node name="ColorRect" type="ColorRect" parent="Postproccess/PostproccessShader5"]
+material = SubResource("ShaderMaterial_oahpn")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

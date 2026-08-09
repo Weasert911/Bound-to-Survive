@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://b4w85r0xh0bor"
+path="res://.godot/imported/scary-ghost-whisper-410565.mp3-0a3a53913d81c3624ac692e96337b7ae.mp3str"
+
+[deps]
+
+source_file="res://assets/Sound FX/Ghost Ambience/scary-ghost-whisper-410565.mp3"
+dest_files=["res://.godot/imported/scary-ghost-whisper-410565.mp3-0a3a53913d81c3624ac692e96337b7ae.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

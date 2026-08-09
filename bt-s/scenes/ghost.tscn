@@ -1,0 +1,150 @@
+[gd_scene load_steps=15 format=3 uid="uid://di104c1v10w8s"]
+
+[ext_resource type="PackedScene" uid="uid://6obx1rlyqodc" path="res://assets/Ghost/Ghoooooost.glb" id="1_t76o2"]
+[ext_resource type="Script" uid="uid://cc60csgy37keo" path="res://scripts/ghost.gd" id="2_l5lq6"]
+[ext_resource type="Shader" uid="uid://cfeppbu567jwg" path="res://shaders/ghost.gdshader" id="3_bbnym"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bbnym"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5mfnq"]
+render_priority = 0
+shader = ExtResource("3_bbnym")
+shader_parameter/artifact_strength = 1.0
+shader_parameter/time_desync = 0.35
+shader_parameter/fracture_density = 22.0
+shader_parameter/red_error_power = 1.8
+shader_parameter/opacity = 0.55
+shader_parameter/base_color = Color(0.85, 0.88, 0.92, 1)
+shader_parameter/error_color = Color(0.9, 0.05, 0.05, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lv6vd"]
+render_priority = 0
+shader = ExtResource("3_bbnym")
+shader_parameter/artifact_strength = 1.0
+shader_parameter/time_desync = 0.35
+shader_parameter/fracture_density = 22.0
+shader_parameter/red_error_power = 1.8
+shader_parameter/opacity = 0.55
+shader_parameter/base_color = Color(0.85, 0.88, 0.92, 1)
+shader_parameter/error_color = Color(0.9, 0.05, 0.05, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sv5gc"]
+render_priority = 0
+shader = ExtResource("3_bbnym")
+shader_parameter/artifact_strength = 1.0
+shader_parameter/time_desync = 0.35
+shader_parameter/fracture_density = 22.0
+shader_parameter/red_error_power = 1.8
+shader_parameter/opacity = 0.55
+shader_parameter/base_color = Color(0.85, 0.88, 0.92, 1)
+shader_parameter/error_color = Color(0.9, 0.05, 0.05, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wj1r3"]
+render_priority = 0
+shader = ExtResource("3_bbnym")
+shader_parameter/artifact_strength = 1.0
+shader_parameter/time_desync = 0.35
+shader_parameter/fracture_density = 22.0
+shader_parameter/red_error_power = 1.8
+shader_parameter/opacity = 0.55
+shader_parameter/base_color = Color(0.85, 0.88, 0.92, 1)
+shader_parameter/error_color = Color(0.9, 0.05, 0.05, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_seks5"]
+render_priority = 0
+shader = ExtResource("3_bbnym")
+shader_parameter/artifact_strength = 1.0
+shader_parameter/time_desync = 0.35
+shader_parameter/fracture_density = 22.0
+shader_parameter/red_error_power = 1.8
+shader_parameter/opacity = 0.55
+shader_parameter/base_color = Color(0.85, 0.88, 0.92, 1)
+shader_parameter/error_color = Color(0.9, 0.05, 0.05, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4pqta"]
+render_priority = 0
+shader = ExtResource("3_bbnym")
+shader_parameter/artifact_strength = 1.0
+shader_parameter/time_desync = 0.35
+shader_parameter/fracture_density = 22.0
+shader_parameter/red_error_power = 1.8
+shader_parameter/opacity = 0.55
+shader_parameter/base_color = Color(0.85, 0.88, 0.92, 1)
+shader_parameter/error_color = Color(0.9, 0.05, 0.05, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ok4sd"]
+render_priority = 0
+shader = ExtResource("3_bbnym")
+shader_parameter/artifact_strength = 1.0
+shader_parameter/time_desync = 0.35
+shader_parameter/fracture_density = 22.0
+shader_parameter/red_error_power = 1.8
+shader_parameter/opacity = 0.55
+shader_parameter/base_color = Color(0.85, 0.88, 0.92, 1)
+shader_parameter/error_color = Color(0.9, 0.05, 0.05, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_o57ao"]
+render_priority = 0
+shader = ExtResource("3_bbnym")
+shader_parameter/artifact_strength = 1.0
+shader_parameter/time_desync = 0.35
+shader_parameter/fracture_density = 22.0
+shader_parameter/red_error_power = 1.8
+shader_parameter/opacity = 0.55
+shader_parameter/base_color = Color(0.85, 0.88, 0.92, 1)
+shader_parameter/error_color = Color(0.9, 0.05, 0.05, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_veat2"]
+render_priority = 0
+shader = ExtResource("3_bbnym")
+shader_parameter/artifact_strength = 2.0
+shader_parameter/time_desync = 0.0
+shader_parameter/fracture_density = 1.0
+shader_parameter/red_error_power = 3.0
+shader_parameter/opacity = 0.3170000150575
+shader_parameter/base_color = Color(0.422371, 0.422371, 0.422371, 1)
+shader_parameter/error_color = Color(0.53912, 0, 0.024988428, 1)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_bbnym"]
+radius = 2.0
+
+[node name="Ghost" instance=ExtResource("1_t76o2")]
+collision_layer = 255
+collision_mask = 255
+input_ray_pickable = false
+script = ExtResource("2_l5lq6")
+
+[node name="group2008820591" parent="." index="1"]
+surface_material_override/0 = SubResource("ShaderMaterial_bbnym")
+
+[node name="group108580628" parent="." index="2"]
+surface_material_override/0 = SubResource("ShaderMaterial_5mfnq")
+
+[node name="group40726355" parent="." index="3"]
+surface_material_override/0 = SubResource("ShaderMaterial_lv6vd")
+
+[node name="group1474427492" parent="." index="4"]
+surface_material_override/0 = SubResource("ShaderMaterial_sv5gc")
+
+[node name="group788695068" parent="." index="5"]
+surface_material_override/0 = SubResource("ShaderMaterial_wj1r3")
+
+[node name="group1165802152" parent="." index="6"]
+surface_material_override/0 = SubResource("ShaderMaterial_seks5")
+
+[node name="group956424346" parent="." index="7"]
+surface_material_override/0 = SubResource("ShaderMaterial_4pqta")
+
+[node name="group1921524710" parent="." index="8"]
+surface_material_override/0 = SubResource("ShaderMaterial_ok4sd")
+
+[node name="group41239209" parent="." index="9"]
+surface_material_override/0 = SubResource("ShaderMaterial_o57ao")
+
+[node name="group473796594" parent="." index="10"]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+surface_material_override/0 = SubResource("ShaderMaterial_veat2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." index="11"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27916145, -0.3672489, -1.3757491)
+shape = SubResource("SphereShape3D_bbnym")
