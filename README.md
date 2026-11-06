@@ -1,20 +1,25 @@
-# X
+# Bound to Survive
 
-Working repository for **YOU MUST EAT** — a single-player narrative stealth-FPS set in Dharavi, Mumbai. The design suite defines the game; the playable slice grows toward it.
+Ninety seconds. One room. One ghost that teleports. Tag it with the flashlight to bank score at a cooldown cost — and don't get caught: every stun makes the ghost faster.
 
-## What's here
+## How it plays
 
-- `docs/` — the design suite: [Master GDD](docs/MASTER_GDD.md) (v4.0), [Demo Design Document](docs/DEMO_DESIGN_DOCUMENT.md) (vertical-slice scope), [Gameplay Spec](docs/GAMEPLAY_SPEC.md), [Technical Art Spec](docs/TECHNICAL_ART_SPEC.md). Superseded revisions live in `docs/archive/`.
-- `GAME/game-files/` — the playable slice: first-person movement, weapon and pickup systems (pistol / SMG resources, weapon manager, hit feedback, crosshair), interaction prompts, FPS meter, and GameManager + save-system autoloads.
+- WASD to move, mouse to look and aim; mouse is captured while playing
+- Flashlight on the `flashlight_toggle` action; battery drains, runs low, and hits push distress feedback through the HUD shader
+- The ghost teleports between marked spots, escalates with each hit, and strikes up close
+- Score, hearts, and timer live on the HUD; intro, run, and result screen complete the loop
 
-## Design pillars
+## Run it
 
-- **Shadow Merge ("Hashing Shadows")** — shadows are sanctuary, light is exposure
-- **High-contrast look** — black, white, and blood red; bold outlines through the comic-ink post-process pipeline
-- **Underdog tension** — stealth first, combat optional and risky; not a power fantasy
+Open [`bt-s/project.godot`](bt-s/project.godot) in Godot 4.5 and run the project. Full controls and mechanics notes: [`bt-s/PLAYER_GUIDE.md`](bt-s/PLAYER_GUIDE.md).
+
+## Layout
+
+- `bt-s/` — the Godot 4.5 project (the live one)
+- `BTS/`, `BTS.7z` — earlier snapshots kept for history
 
 ## Status
 
-Prototype. The slice proves weapon and movement systems while design work continues.
+Playable 90-second survival loop: intro, round, win/lose, restart.
 
-Built with **Godot 4.7** (Forward+), GDScript and GDShader.
+Godot 4.5 · GDScript
